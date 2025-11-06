@@ -1,0 +1,6 @@
+# My Test Database and Its Creation Script
+create_milionare_table.py
+meu_banco.db
+
+# .env file
+.env

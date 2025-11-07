@@ -7,3 +7,6 @@ meu_banco.db
 
 # Python Cache Files
 *.pyc
+
+# Folder where all Excel files are saved.
+relatorios_excel

@@ -25,6 +25,7 @@ def database_connection():
     try:
         with engine.connect() as connection:
             print("Conexão realizada no banco: ")
+            print("-"*60)
     except Exception as e:
         print("Não conectou meu bruxo :(\nMotivo: ",e)
         exit()

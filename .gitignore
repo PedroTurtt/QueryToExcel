@@ -4,3 +4,6 @@ meu_banco.db
 
 # .env file
 .env
+
+# Python Cache Files
+*.pyc

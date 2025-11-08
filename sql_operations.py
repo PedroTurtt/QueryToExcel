@@ -3,6 +3,11 @@ from connection_db import database_connection
 import os
 import openpyxl
 
+def convert_byte_to_hex(valor):
+    if isinstance(valor, bytes):
+        return valor.hex().upper()
+    return valor
+
 def search_and_save(query, engine_db, blocksize):
     output_folder = "relatorios_excel"
 
@@ -11,13 +16,32 @@ def search_and_save(query, engine_db, blocksize):
     print("-"*60)
 
     block_counter = 0
+    
+    coluns_to_convert = []
 
     try:
         for df_block in pd.read_sql_query(query, engine_db, chunksize=blocksize):
             block_counter +=  1
             print(f"Bloco {block_counter}") 
             print(f"Qnt linhas/colunas\n{df_block.shape}")
+            
+            if block_counter == 1:
+                for col_name in df_block.select_dtypes(include=['object']).columns:
+                    data_notnull = df_block[col_name].dropna()
+                    
+                    if not data_notnull.empty:
+                        first_data = data_notnull.iloc[0]
+                        
+                        if isinstance(first_data, bytes):
+                            coluns_to_convert.append(col_name)
+            if not coluns_to_convert:
+                print("Nenhuma coluna 'bytes' (RAW) detectada.")
 
+            if coluns_to_convert:
+                for colun in coluns_to_convert:
+                    if colun in df_block.columns:
+                        df_block[colun] = df_block[colun].apply(convert_byte_to_hex)
+                    
             file_name = f"arquivo_{block_counter}.xlsx"
             file_path = os.path.join(output_folder, file_name)
 

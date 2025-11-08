@@ -2,6 +2,8 @@ import pandas as pd
 from connection_db import database_connection
 import os
 import openpyxl
+import time
+from datetime import datetime
 
 def convert_byte_to_hex(valor):
     if isinstance(valor, bytes):
@@ -18,6 +20,8 @@ def search_and_save(query, engine_db, blocksize):
     block_counter = 0
     
     coluns_to_convert = []
+    
+    start_timer = time.time()
 
     try:
         for df_block in pd.read_sql_query(query, engine_db, chunksize=blocksize):
@@ -25,6 +29,7 @@ def search_and_save(query, engine_db, blocksize):
             print(f"Bloco {block_counter}") 
             print(f"Qnt linhas/colunas\n{df_block.shape}")
             
+            # Verify a 
             if block_counter == 1:
                 for col_name in df_block.select_dtypes(include=['object']).columns:
                     data_notnull = df_block[col_name].dropna()
@@ -56,6 +61,11 @@ def search_and_save(query, engine_db, blocksize):
             print("-"*60)
 
         print(f"Processo Concluido!\nTotal blocos lidos: {block_counter}\nArquivos estão salvos na pasta {output_folder}")
+        end_timer = time.time()
+        final_time = end_timer-start_timer
+        minutes = int(final_time // 60) 
+        seconds = int(final_time % 60)
+        print(f"Tempo total para a operação: {minutes} minutos e {seconds} segundos.")
 
     except Exception as e:
         print(f"Erro ao gerar a consulta\nMotivo:{e}")
